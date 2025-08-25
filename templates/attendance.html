@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance - {{ class_obj.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.classes') }}">Classes</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('main.students', class_id=class_obj.id) }}">{{ class_obj.name }}</a></li>
+                <li class="breadcrumb-item active">Attendance</li>
+            </ol>
+        </nav>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1><i class="bi bi-check2-square"></i> Mark Attendance</h1>
+                <p class="text-muted">{{ class_obj.name }} - {{ class_obj.subject }}</p>
+            </div>
+            <div>
+                <a href="{{ url_for('main.students', class_id=class_obj.id) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-people"></i> Manage Students
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if students %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">Attendance for {{ attendance_date.strftime('%B %d, %Y') }}</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <form method="GET" class="d-flex">
+                            <input type="date" class="form-control me-2" name="date" value="{{ attendance_date.strftime('%Y-%m-%d') }}">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-calendar"></i> Change Date
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.mark_attendance', class_id=class_obj.id) }}">
+                    <input type="hidden" name="date" value="{{ attendance_date.strftime('%Y-%m-%d') }}">
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th class="text-center">Present</th>
+                                    <th class="text-center">Absent</th>
+                                    <th class="text-center">Late</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ student.student_id }}</td>
+                                    <td>{{ student.name }}</td>
+                                    <td>{{ student.email }}</td>
+                                    <td class="text-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                   name="attendance_{{ student.id }}" 
+                                                   value="Present" 
+                                                   {% if existing_attendance.get(student.id) == 'Present' %}checked{% endif %}>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                   name="attendance_{{ student.id }}" 
+                                                   value="Absent" 
+                                                   {% if existing_attendance.get(student.id) == 'Absent' %}checked{% endif %}>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                   name="attendance_{{ student.id }}" 
+                                                   value="Late" 
+                                                   {% if existing_attendance.get(student.id) == 'Late' %}checked{% endif %}>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div>
+                            <button type="button" class="btn btn-outline-success" onclick="markAllPresent()">
+                                <i class="bi bi-check-all"></i> Mark All Present
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="markAllAbsent()">
+                                <i class="bi bi-x-square"></i> Mark All Absent
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-save"></i> Save Attendance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning text-center">
+    <i class="bi bi-exclamation-triangle display-4 d-block mb-3"></i>
+    <h4>No students found</h4>
+    <p>Please add students to this class before marking attendance.</p>
+    <a href="{{ url_for('main.students', class_id=class_obj.id) }}" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Add Students
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function markAllPresent() {
+    const presentRadios = document.querySelectorAll('input[type="radio"][value="Present"]');
+    presentRadios.forEach(radio => {
+        radio.checked = true;
+    });
+}
+
+function markAllAbsent() {
+    const absentRadios = document.querySelectorAll('input[type="radio"][value="Absent"]');
+    absentRadios.forEach(radio => {
+        radio.checked = true;
+    });
+}
+
+// Auto-save functionality (optional)
+document.addEventListener('DOMContentLoaded', function() {
+    const radioButtons = document.querySelectorAll('input[type="radio"]');
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Visual feedback for changed status
+            const row = this.closest('tr');
+            row.classList.add('table-active');
+            setTimeout(() => {
+                row.classList.remove('table-active');
+            }, 500);
+        });
+    });
+});
+</script>
+{% endblock %}

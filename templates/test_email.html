@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Test Email - Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-envelope-check"></i> Test Email Configuration</h3>
+                <p class="mb-0 text-muted">Send a test email to verify your SMTP settings</p>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Important:</strong> Make sure your SMTP credentials are configured before testing.
+                    <a href="{{ url_for('main.email_settings') }}" class="alert-link">Check Email Settings</a>
+                </div>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="test_email" class="form-label">Test Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" id="test_email" name="test_email" 
+                                   required placeholder="Enter email address to test">
+                        </div>
+                        <div class="form-text">
+                            Send a test email to this address to verify your email configuration is working.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Send Test Email
+                        </button>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Email Configuration Tips -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="bi bi-lightbulb"></i> Email Configuration Tips</h5>
+            </div>
+            <div class="card-body">
+                <h6>For Gmail SMTP:</h6>
+                <ul class="mb-3">
+                    <li><strong>SMTP_SERVER:</strong> smtp.gmail.com</li>
+                    <li><strong>SMTP_PORT:</strong> 587</li>
+                    <li><strong>SMTP_USERNAME:</strong> your-gmail-address@gmail.com</li>
+                    <li><strong>SMTP_PASSWORD:</strong> your-app-specific-password</li>
+                </ul>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Gmail Security:</strong> Use an App-Specific Password, not your regular Gmail password.
+                    <a href="https://support.google.com/accounts/answer/185833" target="_blank" class="alert-link">
+                        Learn how to create one
+                    </a>
+                </div>
+                
+                <h6 class="mt-3">For Other Email Providers:</h6>
+                <p class="text-muted">
+                    Consult your email provider's documentation for SMTP settings. Most providers support
+                    SMTP authentication on port 587 with STARTTLS encryption.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-speedometer2"></i> Dashboard
+            <small class="text-muted">Welcome back, {{ session.teacher_name }}!</small>
+        </h1>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-collection display-4"></i>
+                <h3 class="mt-2">{{ total_classes }}</h3>
+                <p class="mb-0">Total Classes</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-info">
+            <div class="card-body text-center">
+                <i class="bi bi-people display-4"></i>
+                <h3 class="mt-2">{{ total_students }}</h3>
+                <p class="mb-0">Total Students</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-success">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-check display-4"></i>
+                <h3 class="mt-2">{{ recent_attendance|length }}</h3>
+                <p class="mb-0">Recent Records</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h3><i class="bi bi-lightning"></i> Quick Actions</h3>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('main.classes') }}" class="btn btn-outline-primary w-100 p-3">
+                    <i class="bi bi-collection display-6 d-block mb-2"></i>
+                    Manage Classes
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('main.history') }}" class="btn btn-outline-info w-100 p-3">
+                    <i class="bi bi-clock-history display-6 d-block mb-2"></i>
+                    View History
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <button class="btn btn-outline-success w-100 p-3" onclick="showExportModal()">
+                    <i class="bi bi-download display-6 d-block mb-2"></i>
+                    Export Data
+                </button>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('main.email_settings') }}" class="btn btn-outline-warning w-100 p-3">
+                    <i class="bi bi-envelope-gear display-6 d-block mb-2"></i>
+                    Email Settings
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Attendance Records -->
+<div class="row">
+    <div class="col-12">
+        <h3><i class="bi bi-clock-history"></i> Recent Attendance Records</h3>
+        {% if recent_attendance %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Class</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Marked At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in recent_attendance %}
+                    <tr>
+                        <td>{{ record.student.name }}</td>
+                        <td>{{ record.class_ref.name }}</td>
+                        <td>{{ record.date.strftime('%b %d, %Y') }}</td>
+                        <td>
+                            {% if record.status == 'Present' %}
+                                <span class="badge bg-success">{{ record.status }}</span>
+                            {% elif record.status == 'Absent' %}
+                                <span class="badge bg-danger">{{ record.status }}</span>
+                            {% else %}
+                                <span class="badge bg-warning">{{ record.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.marked_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No attendance records found. Start marking attendance for your classes!
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

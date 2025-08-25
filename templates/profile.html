@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-person-circle"></i> Teacher Profile</h3>
+                <p class="mb-0 text-muted">Manage your account information</p>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ teacher.name }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" value="{{ teacher.email }}" disabled>
+                        </div>
+                        <div class="form-text">Email cannot be changed</div>
+                    </div>
+                    
+                    <hr>
+                    <h5><i class="bi bi-lock"></i> Change Password (Optional)</h5>
+                    
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" id="new_password" name="new_password" 
+                                   minlength="6" placeholder="Leave blank to keep current password">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                                   minlength="6" placeholder="Confirm new password">
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Update Profile
+                        </button>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Account Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Account Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Member Since:</strong>
+                    </div>
+                    <div class="col-6">
+                        {{ teacher.created_at.strftime('%B %d, %Y') }}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Email Notifications:</strong>
+                    </div>
+                    <div class="col-6">
+                        {% if teacher.email_notifications_enabled %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i> Enabled
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-x-circle"></i> Disabled
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <strong>SMTP Configuration:</strong>
+                    </div>
+                    <div class="col-6">
+                        {% if teacher.has_email_config() %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i> Configured
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning">
+                                <i class="bi bi-exclamation-triangle"></i> Not Configured
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if not teacher.has_email_config() %}
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-lightbulb"></i>
+                    <strong>Tip:</strong> Configure your email settings to enable automatic absence notifications.
+                    <a href="{{ url_for('main.email_settings') }}" class="alert-link">Configure Email Settings</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const newPassword = document.getElementById('new_password');
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    function validatePassword() {
+        if (newPassword.value && newPassword.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity("Passwords don't match");
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+    
+    newPassword.addEventListener('input', validatePassword);
+    confirmPassword.addEventListener('input', validatePassword);
+});
+</script>
+{% endblock %}

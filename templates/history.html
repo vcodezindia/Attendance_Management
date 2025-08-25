@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance History{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-clock-history"></i> Attendance History</h1>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filters & Export</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="class_id" class="form-label">Class</label>
+                        <select class="form-select" id="class_id" name="class_id">
+                            <option value="">All Classes</option>
+                            {% for class in teacher_classes %}
+                            <option value="{{ class.id }}" {% if current_class_id == class.id %}selected{% endif %}>
+                                {{ class.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ current_start_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ current_end_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Filter
+                            </button>
+                            <a href="{{ url_for('main.history') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
+                
+                {% if current_class_id %}
+                <hr>
+                <!-- Enhanced Export Options -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="export_start_date" class="form-label">From Date (Optional)</label>
+                        <input type="date" class="form-control" id="export_start_date">
+                        <div class="form-text">Leave empty for all dates</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="export_end_date" class="form-label">To Date (Optional)</label>
+                        <input type="date" class="form-control" id="export_end_date">
+                        <div class="form-text">Leave empty for all dates</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Export Options</label>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success" onclick="exportData('excel', {{ current_class_id }})">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Export Excel
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="exportData('csv', {{ current_class_id }})">
+                                <i class="bi bi-file-earmark-text"></i> Export CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <hr>
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Please select a specific class to enable export functionality.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Records -->
+<div class="row">
+    <div class="col-12">
+        {% if attendance_records %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Attendance Records ({{ attendance_records|length }} records)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Class</th>
+                                <th>Student</th>
+                                <th>Student ID</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Marked At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in attendance_records %}
+                            <tr>
+                                <td>{{ record.date.strftime('%b %d, %Y') }}</td>
+                                <td>{{ record.class_ref.name }}</td>
+                                <td>{{ record.student.name }}</td>
+                                <td>{{ record.student.student_id }}</td>
+                                <td>{{ record.student.email }}</td>
+                                <td>
+                                    {% if record.status == 'Present' %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> {{ record.status }}
+                                        </span>
+                                    {% elif record.status == 'Absent' %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle"></i> {{ record.status }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-clock"></i> {{ record.status }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ record.marked_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-calendar-x display-4 d-block mb-3"></i>
+            <h4>No attendance records found</h4>
+            <p>No records match your current filter criteria. Try adjusting the filters or start marking attendance for your classes.</p>
+            <a href="{{ url_for('main.classes') }}" class="btn btn-primary">
+                <i class="bi bi-collection"></i> Go to Classes
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Summary Statistics (if filtered by class) -->
+{% if current_class_id and attendance_records %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Summary Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    {% set present_count = attendance_records | selectattr('status', 'equalto', 'Present') | list | length %}
+                    {% set absent_count = attendance_records | selectattr('status', 'equalto', 'Absent') | list | length %}
+                    {% set late_count = attendance_records | selectattr('status', 'equalto', 'Late') | list | length %}
+                    {% set total_count = attendance_records | length %}
+                    
+                    <div class="col-md-3">
+                        <div class="card bg-success">
+                            <div class="card-body">
+                                <h3>{{ present_count }}</h3>
+                                <p class="mb-0">Present ({{ "%.1f"|format((present_count / total_count * 100) if total_count > 0 else 0) }}%)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-danger">
+                            <div class="card-body">
+                                <h3>{{ absent_count }}</h3>
+                                <p class="mb-0">Absent ({{ "%.1f"|format((absent_count / total_count * 100) if total_count > 0 else 0) }}%)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning">
+                            <div class="card-body">
+                                <h3>{{ late_count }}</h3>
+                                <p class="mb-0">Late ({{ "%.1f"|format((late_count / total_count * 100) if total_count > 0 else 0) }}%)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info">
+                            <div class="card-body">
+                                <h3>{{ total_count }}</h3>
+                                <p class="mb-0">Total Records</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function exportData(format, classId) {
+    try {
+        console.log('Export function called with format:', format, 'classId:', classId);
+        
+        // Get optional date filters
+        const startDateEl = document.getElementById('export_start_date');
+        const endDateEl = document.getElementById('export_end_date');
+        
+        if (!startDateEl || !endDateEl) {
+            console.error('Date input elements not found');
+            alert('Error: Date input elements not found');
+            return;
+        }
+        
+        const startDate = startDateEl.value;
+        const endDate = endDateEl.value;
+        
+        console.log('Date filters:', startDate, endDate);
+        
+        // Build URL with parameters
+        let url = format === 'excel' ? `/export/excel?class_id=${classId}` : `/export/csv?class_id=${classId}`;
+        
+        if (startDate) {
+            url += `&start_date=${startDate}`;
+        }
+        if (endDate) {
+            url += `&end_date=${endDate}`;
+        }
+        
+        console.log('Final URL:', url);
+        
+        // Validate date range
+        if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+            alert('Start date cannot be later than end date.');
+            return;
+        }
+        
+        // Try to navigate to the URL
+        window.location.href = url;
+        
+    } catch (error) {
+        console.error('Export function error:', error);
+        alert('Error occurred during export: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

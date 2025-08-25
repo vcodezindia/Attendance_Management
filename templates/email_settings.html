@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Email Settings - Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="bi bi-gear"></i> Email Configuration Status</h3>
+                <p class="mb-0 text-muted">Check your current SMTP email settings</p>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="email_notifications_enabled" 
+                                       name="email_notifications_enabled" {% if teacher.email_notifications_enabled %}checked{% endif %}>
+                                <label class="form-check-label" for="email_notifications_enabled">
+                                    <strong>Enable Email Notifications</strong>
+                                </label>
+                                <div class="form-text">Send automatic emails to absent students</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="smtp_email" class="form-label">SMTP Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" class="form-control" id="smtp_email" name="smtp_email" 
+                                           value="{{ teacher.smtp_email or '' }}" placeholder="your-email@gmail.com">
+                                </div>
+                                <div class="form-text">Email address used to send notifications</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="smtp_password" class="form-label">App Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                                    <input type="password" class="form-control" id="smtp_password" name="smtp_password" 
+                                           placeholder="Enter app-specific password">
+                                </div>
+                                <div class="form-text">Use app-specific password, not regular password</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="smtp_server" class="form-label">SMTP Server</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-server"></i></span>
+                                    <input type="text" class="form-control" id="smtp_server" name="smtp_server" 
+                                           value="{{ teacher.smtp_server or 'smtp.gmail.com' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="smtp_port" class="form-label">SMTP Port</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                    <input type="number" class="form-control" id="smtp_port" name="smtp_port" 
+                                           value="{{ teacher.smtp_port or 587 }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save Settings
+                        </button>
+                        {% if config_status.fully_configured %}
+                            <a href="{{ url_for('main.test_email') }}" class="btn btn-success">
+                                <i class="bi bi-envelope-check"></i> Test Email
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+                
+                <!-- Configuration Status -->
+                <hr class="my-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card {% if config_status.fully_configured %}bg-success{% else %}bg-warning{% endif %}">
+                            <div class="card-body text-center">
+                                <i class="bi {% if config_status.fully_configured %}bi-check-circle{% else %}bi-exclamation-triangle{% endif %} display-4"></i>
+                                <h4 class="mt-2">{% if config_status.fully_configured %}Ready{% else %}Needs Setup{% endif %}</h4>
+                                <p class="mb-0">Email Configuration</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-info">
+                            <div class="card-body text-center">
+                                <i class="bi bi-server display-4"></i>
+                                <h4 class="mt-2">{{ config_status.server }}</h4>
+                                <p class="mb-0">SMTP Server</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Configuration -->
+                <h5><i class="bi bi-list-check"></i> Configuration Details</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td><strong>SMTP Server</strong></td>
+                                <td>{{ config_status.server }}</td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Configured
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>SMTP Port</strong></td>
+                                <td>{{ config_status.port }}</td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Configured
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Username</strong></td>
+                                <td>
+                                    {% if config_status.username_configured %}
+                                        <span class="text-muted">••••••••@••••.com</span>
+                                    {% else %}
+                                        <span class="text-muted">Not configured</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if config_status.username_configured %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Configured
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle"></i> Missing
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Password</strong></td>
+                                <td>
+                                    {% if config_status.password_configured %}
+                                        <span class="text-muted">••••••••••••</span>
+                                    {% else %}
+                                        <span class="text-muted">Not configured</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if config_status.password_configured %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Configured
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle"></i> Missing
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mt-4">
+                    {% if config_status.fully_configured %}
+                        <a href="{{ url_for('main.test_email') }}" class="btn btn-success">
+                            <i class="bi bi-envelope-check"></i> Test Email Configuration
+                        </a>
+                    {% else %}
+                        <button class="btn btn-warning" onclick="showSetupInstructions()">
+                            <i class="bi bi-gear"></i> Setup Instructions
+                        </button>
+                    {% endif %}
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Setup Instructions (Initially Hidden) -->
+        <div class="card mt-4" id="setupInstructions" style="display: none;">
+            <div class="card-header">
+                <h5><i class="bi bi-book"></i> SMTP Setup Instructions</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Environment Variables Required:</strong> You need to set these environment variables in your Replit secrets.
+                </div>
+                
+                <h6>Required Environment Variables:</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Variable Name</th>
+                                <th>Description</th>
+                                <th>Example Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>SMTP_USERNAME</code></td>
+                                <td>Your email address</td>
+                                <td>teacher@gmail.com</td>
+                            </tr>
+                            <tr>
+                                <td><code>SMTP_PASSWORD</code></td>
+                                <td>Your email password or app-specific password</td>
+                                <td>your-app-password</td>
+                            </tr>
+                            <tr>
+                                <td><code>SMTP_SERVER</code> (optional)</td>
+                                <td>SMTP server address</td>
+                                <td>smtp.gmail.com</td>
+                            </tr>
+                            <tr>
+                                <td><code>SMTP_PORT</code> (optional)</td>
+                                <td>SMTP server port</td>
+                                <td>587</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-shield-exclamation"></i>
+                    <strong>Security Note:</strong> For Gmail, use an App-Specific Password instead of your regular password.
+                    <a href="https://support.google.com/accounts/answer/185833" target="_blank" class="alert-link">
+                        Learn how to create one
+                    </a>
+                </div>
+                
+                <h6>How to Set Environment Variables in Replit:</h6>
+                <ol>
+                    <li>Go to your Replit project</li>
+                    <li>Click on "Secrets" in the left sidebar</li>
+                    <li>Add each required environment variable</li>
+                    <li>Restart your application</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showSetupInstructions() {
+    const instructions = document.getElementById('setupInstructions');
+    instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

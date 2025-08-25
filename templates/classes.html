@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Classes - Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-collection"></i> My Classes</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClassModal">
+                <i class="bi bi-plus-circle"></i> Add Class
+            </button>
+        </div>
+    </div>
+</div>
+
+{% if classes %}
+<div class="row">
+    {% for class in classes %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{{ class.name }}</h5>
+                <small class="text-muted">{{ class.subject }}</small>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <i class="bi bi-people"></i> {{ class.students|length }} students<br>
+                    <i class="bi bi-calendar-plus"></i> Created: {{ class.created_at.strftime('%b %d, %Y') }}
+                </p>
+            </div>
+            <div class="card-footer">
+                <div class="btn-group w-100" role="group">
+                    <a href="{{ url_for('main.students', class_id=class.id) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-people"></i> Students
+                    </a>
+                    <a href="{{ url_for('main.attendance', class_id=class.id) }}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-check2-square"></i> Attendance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+    <i class="bi bi-info-circle display-4 d-block mb-3"></i>
+    <h4>No classes found</h4>
+    <p>Get started by adding your first class!</p>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClassModal">
+        <i class="bi bi-plus-circle"></i> Add Your First Class
+    </button>
+</div>
+{% endif %}
+
+<!-- Add Class Modal -->
+<div class="modal fade" id="addClassModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Class</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('main.add_class') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Class Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required placeholder="e.g., Computer Science 101">
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required placeholder="e.g., Computer Science">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check"></i> Add Class
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

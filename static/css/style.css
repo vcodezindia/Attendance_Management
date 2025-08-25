@@ -1,0 +1,248 @@
+/* Custom styles for Attendance Management System */
+
+/* Override default Bootstrap dark theme where needed */
+:root {
+    --bs-border-radius: 0.5rem;
+    --bs-border-radius-lg: 0.75rem;
+}
+
+/* Enhanced card styling */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+}
+
+/* Status badges enhancement */
+.badge {
+    font-size: 0.75em;
+    padding: 0.375rem 0.75rem;
+}
+
+/* Table enhancements */
+.table {
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+/* Form enhancements */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.input-group-text {
+    background-color: var(--bs-secondary-bg);
+    border-color: var(--bs-border-color);
+}
+
+/* Button enhancements */
+.btn {
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Navigation enhancements */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+}
+
+/* Dashboard statistics cards */
+.card.bg-primary,
+.card.bg-info,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-danger {
+    color: white;
+}
+
+.card.bg-primary .card-body,
+.card.bg-info .card-body,
+.card.bg-success .card-body,
+.card.bg-warning .card-body,
+.card.bg-danger .card-body {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+/* Quick action buttons */
+.btn.p-3 {
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.btn.p-3:hover {
+    text-decoration: none;
+}
+
+/* Footer styling */
+footer {
+    margin-top: auto;
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+    border-radius: var(--bs-border-radius);
+}
+
+/* Modal enhancements */
+.modal-content {
+    border: none;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--bs-border-color);
+}
+
+/* Alert enhancements */
+.alert {
+    border: none;
+    border-radius: var(--bs-border-radius-lg);
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+}
+
+/* Form radio button enhancements for attendance */
+.form-check-input[type="radio"] {
+    width: 1.25em;
+    height: 1.25em;
+}
+
+.form-check-input[type="radio"]:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+/* Attendance table row highlighting */
+.table tbody tr:hover {
+    background-color: var(--bs-table-hover-bg);
+}
+
+.table-active {
+    --bs-table-accent-bg: var(--bs-primary);
+    color: white;
+}
+
+/* Loading state styles */
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .btn,
+    .modal,
+    footer {
+        display: none !important;
+    }
+    
+    .container {
+        max-width: none !important;
+        padding: 0 !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Dark mode specific adjustments */
+[data-bs-theme="dark"] {
+    --bs-body-bg: #1a1d23;
+    --bs-body-color: #dee2e6;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: var(--bs-dark);
+    border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .table {
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-bg: transparent;
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Success/Error state indicators */
+.is-valid {
+    border-color: var(--bs-success);
+}
+
+.is-invalid {
+    border-color: var(--bs-danger);
+}
+
+/* Custom scrollbar for dark theme */
+[data-bs-theme="dark"]::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-bs-theme="dark"]::-webkit-scrollbar-track {
+    background: var(--bs-dark);
+}
+
+[data-bs-theme="dark"]::-webkit-scrollbar-thumb {
+    background: var(--bs-secondary);
+    border-radius: 4px;
+}
+
+[data-bs-theme="dark"]::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-light);
+}
